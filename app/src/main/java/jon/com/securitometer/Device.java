@@ -9,9 +9,11 @@ public class Device {
     private float appScore;
     private float osScore;
     public Vector<App> apps;
+    public Vector<String> osVulnerabilities;
 
     public Device(){
         apps = new Vector<App>();
+        osVulnerabilities = new Vector<String>();
     }
 
     public void setAppScore(float appScore){

@@ -21,8 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Permission;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -34,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
-    Vector<App> apps;
+    HashMap<String, String> listScores, listChildScores;
+    Device device;
 
     PackageManager pm;
 
@@ -60,33 +64,70 @@ public class MainActivity extends AppCompatActivity {
         pm = getPackageManager();
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<String>>();
+        listScores = new HashMap<String, String>();
+        listChildScores = new HashMap<String, String>();
         listDataHeader.add("Applications");
         listDataHeader.add("Operating System");
-        List<PackageInfo> installedApplications = pm.getInstalledPackages(PackageManager.GET_META_DATA);
+        List<PackageInfo> installedApplications = pm.getInstalledPackages(PackageManager.GET_PERMISSIONS);
 
-        scanApps(installedApplications);
+        device = new Device();
 
-        Log.d("OS", scanOS(android.os.Build.VERSION.RELEASE)+"");
+        listScores.put("Applications", new DecimalFormat("0.00").format(scanApps(installedApplications)));
+        listScores.put("Operating System", new DecimalFormat("0.00").format(scanOS(android.os.Build.VERSION.RELEASE)));
 
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+        listAdapter = new ExpandableListAdapter(this, listDataHeader, listScores, listDataChild, listChildScores);
 
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
         expListView.setAdapter(listAdapter);
     }
 
-    public void scanApps(List<PackageInfo> apps) {
+    public double scanApps(List<PackageInfo> apps) {
         ArrayList<String> listApplicationNames = new ArrayList<String>();
-        for (PackageInfo app : apps) {
-            listApplicationNames.add((String) pm.getApplicationLabel(app.applicationInfo));
-            PermissionInfo[] permissions = app.permissions;
-            if(permissions != null) this.apps.add(new App((String) pm.getApplicationLabel(app.applicationInfo), permissions));
+        List<Double> scores = new ArrayList<Double>();
+        double score = 0.0;
+        try {
+            String json = AssetJSONFile("permissions.json", this.getApplicationContext());
+            JSONObject obj = new JSONObject(json);
+            for (PackageInfo app : apps) {
+                double maliciousScore = 1.0;
+                double benignScore = 1.0;
+                if (app.requestedPermissions != null) {
+                    Iterator<String> iter = obj.keys();
+                    while (iter.hasNext()){
+                        String key = iter.next();
+                        JSONArray values = obj.getJSONArray(key);
+                        if(Arrays.asList(app.requestedPermissions).contains("android.permission."+key)){
+                            benignScore *= values.getDouble(0);
+                            maliciousScore *= values.getDouble(1);
+                        } else {
+                            benignScore *= (1.0-values.getDouble(0));
+                            maliciousScore *= (1.0-values.getDouble(1));
+                        }
+                    }
+                }
+                listApplicationNames.add((String) pm.getApplicationLabel(app.applicationInfo));
+                Log.d("mscore", maliciousScore + "");
+                Log.d("bscore", benignScore+"");
+                double finalScore = maliciousScore/(maliciousScore+benignScore);
+                scores.add(finalScore);
+                listChildScores.put((String) pm.getApplicationLabel(app.applicationInfo), new DecimalFormat("0.00").format(finalScore*10));
+                this.device.apps.add(new App((String) pm.getApplicationLabel(app.applicationInfo), app, finalScore*10));
+            }
+            for (double d : scores) {
+                score += d;
+            }
+            score = score/scores.size();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
         listDataChild.put("Applications", listApplicationNames);
+        return score*10;
     }
 
-    public float scanOS(String version) {
-        ArrayList<String> OSvulnerabilities = new ArrayList<String>();
-        float totalScore = 0, deviceScore = 0;
+    public double scanOS(String version) {
+        double totalScore = 0, deviceScore = 0;
         for (String vulnerability : vulnerabilities) {
             try {
                 String json = AssetJSONFile(vulnerability + ".json", this.getApplicationContext());
@@ -94,21 +135,22 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject obj = new JSONObject(json);
                 if (obj.getJSONArray("Affected_versions_regexp").length() > 0) {
                     String versions_regexp = obj.getJSONArray("Affected_versions_regexp").getString(0);
-                    int score = obj.getInt("Score");
+                    double score = obj.getDouble("Score");
                     //Log.d(vulnerability, versions_regexp);
                     if (version.matches(versions_regexp)) {
-                        OSvulnerabilities.add(vulnerability);
+                        this.device.osVulnerabilities.add(vulnerability);
                         deviceScore += score;
                     }
                     totalScore += score;
+                    listChildScores.put(vulnerability, new DecimalFormat("0.00").format(score));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            listDataChild.put("Operating System", OSvulnerabilities);
+            listDataChild.put("Operating System", this.device.osVulnerabilities);
         }
-        return (deviceScore*10.0f)/totalScore;
+        return (deviceScore*10.0)/totalScore;
     }
 }

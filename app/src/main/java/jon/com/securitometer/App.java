@@ -1,20 +1,18 @@
 package jon.com.securitometer;
 
-import android.content.pm.PermissionInfo;
-
-import java.util.Vector;
+import android.content.pm.PackageInfo;
 
 /**
- * Created by jon on 28/01/16.
+ * Created by Jon on 09/02/2016.
  */
 public class App {
     private String name;
-    private Vector<PermissionInfo> permissionInfos;
+    private PackageInfo packageInfo;
+    private double score;
 
-    public App(String name, PermissionInfo[] permissionInfos) {
+    public App(String name, PackageInfo packageInfo, double score) {
         this.name = name;
-        for (PermissionInfo pi : permissionInfos) {
-            this.permissionInfos.add(pi);
-        }
+        this.packageInfo = packageInfo;
+        this.score = score;
     }
 }

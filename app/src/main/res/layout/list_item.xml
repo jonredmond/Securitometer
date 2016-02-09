@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="55dip">
 
     <TextView
-        android:id="@+id/lblListItem"
-        android:layout_width="fill_parent"
+        android:id="@+id/itemScore"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dip"
+        android:textSize="20dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/rounded_edges"
+        android:gravity="center" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/lblListItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/itemScore"
+        android:textSize="20dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"/>
 
-</LinearLayout>
+</RelativeLayout>

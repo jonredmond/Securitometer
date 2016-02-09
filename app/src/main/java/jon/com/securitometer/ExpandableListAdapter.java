@@ -21,11 +21,15 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> _listDataHeader; // header titles
     // child data in the form header title, child title
     private HashMap<String, List<String>> _listDataChild;
+    private HashMap<String, String> _listScores;
+    private HashMap<String, String> _listChildScores;
 
-    public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, List<String>> listDataChild){
+    public ExpandableListAdapter(Context context, List<String> listDataHeader, HashMap<String, String> listScores, HashMap<String, List<String>> listDataChild, HashMap<String, String> listChildScores){
         this._context = context;
         this._listDataHeader = listDataHeader;
         this._listDataChild = listDataChild;
+        this._listScores = listScores;
+        this._listChildScores = listChildScores;
     }
 
 
@@ -67,25 +71,30 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         final String headerTitle = this._listDataHeader.get(groupPosition);
+        final String score = this._listScores.get(headerTitle);
         if(convertView == null) {
             LayoutInflater infalInflator = (LayoutInflater)this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflator.inflate(R.layout.list_group, null);
         }
         TextView txtListHeader = (TextView)convertView.findViewById(R.id.lblListHeader);
+        TextView txtScore = (TextView)convertView.findViewById(R.id.score);
         txtListHeader.setText(headerTitle);
+        txtScore.setText(score);
         return convertView;
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         final String childText = (String)getChild(groupPosition, childPosition);
-
+        final String score = _listChildScores.get(childText);
         if(convertView == null) {
             LayoutInflater infalInflator = (LayoutInflater)this._context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflator.inflate(R.layout.list_item, null);
         }
         TextView txtListChild = (TextView)convertView.findViewById(R.id.lblListItem);
+        TextView txtChildScore = (TextView)convertView.findViewById(R.id.itemScore);
         txtListChild.setText(childText);
+        txtChildScore.setText(score);
         return convertView;
     }
 
