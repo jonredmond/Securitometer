@@ -1,32 +1,7 @@
 {
   "name" : "zergRush",
-  "CVE" : [["CVE-2011-3874"]],
-  "Responsibly_disclosed" : false,
-  "Categories" : ["system"],
-  "Details" : [["","android-issue-21681"]],
-  "Discovered_by" : [["[The Revolutionary development team](http://revolutionary.io/)"]],
-  "Discovered_on" : [{"date" : "2011-10-06", "bound" : "before", "ref" : "github-zergrush"}],
-  "Submission" : [{"by" : "drt24", "on" : "2013-08-28"}],
-  "Reported_on" : [["2011-11-09","android-issue-21681"]],
-  "Fixed_on" : [["2011-11-09","android-issue-21681"]],
-  "Fix_released_on" : [["2011-11-21","tag-android-2.2.3_r1"]],
+  "Details" : [["Exploit causes the device to run like an emulator in order to call abd as root. The exploit then copies itself multiple times and creates a socket connection to a vulnerable module in Android 2.2 and 2.3. Shell code is sent to this vulnerable module which will be executed as root","android-issue-21681"]],
   "Affected_versions" : [["Android 2.2.x up to and including to 2.2.2, Android 2.3.x up to and including to 2.3.6"]],
-  "Affected_devices" : [["all"]],
   "Affected_versions_regexp" : ["2\\.(([0-1]\\.[0-9])|(2\\.[0-2])|(3\\.[0-6]))"],
-  "Affected_manufacturers" : [["all"]],
-  "Fixed_versions" : [["2.2.3, 2.3.7, 3.x+"]],
-  "Score" : 9.3,
-  "references" : {
-    "android-issue-21681" : {
-      "url" : "https://code.google.com/p/android/issues/detail?id=21681"
-    },
-    "github-zergrush" : {
-      "url" : "https://github.com/revolutionary/zergRush/"
-    },
-    "tag-android-2.2.3_r1" : {
-      "url" : "https://android.googlesource.com/platform/build/+/refs/tags/android-2.2.3_r1",
-      "tag" : "android-2.2.3_r1",
-      "component" : "platform/build"
-    }
-  }
+  "Score" : 9.3
 }

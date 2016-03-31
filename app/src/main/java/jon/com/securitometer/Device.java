@@ -1,34 +1,37 @@
 package jon.com.securitometer;
 
-import java.util.Vector;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jon on 08/02/16.
  */
 public class Device {
-    private float appScore;
-    private float osScore;
-    public Vector<App> apps;
-    public Vector<String> osVulnerabilities;
+    private double _appScore;
+    private double _osScore;
+    public ArrayList<App> apps;
+    public OS os;
 
     public Device(){
-        apps = new Vector<App>();
-        osVulnerabilities = new Vector<String>();
+        apps = new ArrayList<App>();
     }
 
-    public void setAppScore(float appScore){
-        this.appScore = appScore;
+    public void setAppScore(double appScore){
+        this._appScore = appScore;
     }
 
-    public void setOsScore(float osScore){
-        this.osScore = osScore;
+    public void setOsScore(double osScore){
+        this._osScore = osScore;
     }
 
-    private float getAppScore(){
-        return this.appScore;
+    public double getAppScore(){
+        return this._appScore;
     }
 
-    private float getOsScore(){
-        return this.osScore;
+    public double getOsScore(){
+        return this._osScore;
     }
 }
